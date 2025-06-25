@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node
+import os
 
 '''
 Parameter Description:
 ---
-- Set laser scan directon: 
+- Set laser scan directon:
   1. Set counterclockwise, example: {'laser_scan_dir': True}
   2. Set clockwise,        example: {'laser_scan_dir': False}
 - Angle crop setting, Mask data within the set angle range:
@@ -30,14 +32,32 @@ def generate_launch_description():
       output='screen',
       parameters=[
         {'product_name': 'LDLiDAR_STL27L'},
-        {'topic_name': 'scan'},
+        {'topic_name': 'scan_raw'},
         {'frame_id': 'base_laser'},
-        {'port_name': '/dev/ttyUSB0'},
+        {'port_name': '/dev/ldlidar'},
         {'port_baudrate': 921600},
-        {'laser_scan_dir': False},
+        {'laser_scan_dir': True},
         {'enable_angle_crop_func': False},
         {'angle_crop_min': 0.0},
         {'angle_crop_max': 0.0}
+      ]
+  )
+
+  scan_filter_config = os.path.join(
+      get_package_share_directory('ldlidar_stl_ros2'),
+      'config',
+      'laser_filter_config.yaml'
+  )
+
+  scan_filter_node = Node(
+      package='laser_filters',
+      executable="scan_to_scan_filter_chain",
+      # name='scan_filter_node',
+      output='screen',
+      parameters=[scan_filter_config],
+      remappings=[
+          ('/scan', '/scan_raw'),
+          ('/scan_filtered', '/scan'),
       ]
   )
 
@@ -54,6 +74,7 @@ def generate_launch_description():
   ld = LaunchDescription()
 
   ld.add_action(ldlidar_node)
+  ld.add_action(scan_filter_node)
   ld.add_action(base_link_to_laser_tf_node)
 
   return ld
