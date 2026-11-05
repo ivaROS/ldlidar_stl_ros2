@@ -70,5 +70,9 @@ install(DIRECTORY launch rviz2 config
   DESTINATION share/${PROJECT_NAME}/
 )
 
+install(FILES README.md
+  DESTINATION share/${PROJECT_NAME}
+)
+
 
 ament_package()
