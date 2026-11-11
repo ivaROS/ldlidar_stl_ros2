@@ -23,6 +23,10 @@ sudo apt install ros-jazzy-laser-filters ros-jazzy-rviz2
 `laser_filters` is required by the STL-27L launch. It filters `/scan_raw` and
 publishes the RViz-facing `/scan` topic.
 
+`routemapper_lidar.launch.py` starts the STL-27L without the filter and
+publishes the unfiltered scan on `/scan`. It is used on the routemapper
+backpack, where the footprint filter would also remove nearby returns.
+
 ## Create the stable serial-device name
 
 Install the included udev rule once:
