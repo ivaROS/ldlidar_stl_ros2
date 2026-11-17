@@ -27,10 +27,15 @@ def generate_launch_description():
         package='tf2_ros',
         executable='static_transform_publisher',
         name='base_link_to_base_laser_stl27l',
-        arguments=['0', '0', '0.18', '0', '0', '0', 'base_link', 'base_laser'],
+        # Mount CAD: laser frame 0.0257 m above the base, rotated +90 deg (scan data: +91.5 deg).
+        # Old: arguments=['0', '0', '0.18', '0', '0', '0', 'base_link', 'base_laser'],
+        arguments=['--z', '0.0257', '--yaw', '1.5708',
+                   '--frame-id', 'base_link', '--child-frame-id', 'base_laser'],
     )
 
+    # base_link -> base_laser comes from the rig description
+    # (zed_open_capture_ros/launch/routemapper_tf.launch.py, same 0.0257 m, +90 deg).
+    # Old: base_link_to_laser_tf_node was started here.
     return LaunchDescription([
         ldlidar_node,
-        base_link_to_laser_tf_node,
     ])
